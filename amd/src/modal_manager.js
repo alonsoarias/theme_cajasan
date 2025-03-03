@@ -5,7 +5,7 @@
  * simulando el comportamiento de Bootstrap.
  *
  * @module     theme_cajasan/modal_manager
- * @copyright  2024 Cajasan
+ * @copyright  2025 Cajasan
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery'], function($) {
