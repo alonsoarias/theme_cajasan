@@ -32,17 +32,17 @@ class settings {
         $templatecontext = [];
         
         // Retrieve 'my_credit' from the theme settings
-        $templatecontext['my_credit'] = get_string('credit', 'theme_inteb');
+        $templatecontext['my_credit'] = get_string('credit', 'theme_cajasan');
         
         // Comprobar y cargar correctamente abouttitle
         $templatecontext['abouttitle'] = $this->theme->settings->abouttitle
             ? $this->theme->settings->abouttitle 
-            : get_string('abouttitle_default', 'theme_inteb');
+            : get_string('abouttitle_default', 'theme_cajasan'); 
         
         // Comprobar y cargar correctamente abouttext
         $templatecontext['abouttext'] = $this->theme->settings->abouttext
             ? $this->theme->settings->abouttext 
-            : get_string('abouttext_default', 'theme_inteb');
+            : get_string('abouttext_default', 'theme_cajasan');
         
         return $templatecontext;
     }
