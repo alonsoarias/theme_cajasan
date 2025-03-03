@@ -41,7 +41,7 @@ $string['customcss'] = 'CSS Personalizado';
 $string['customcssdesc'] = 'Cualquier regla CSS que agregue a esta área se reflejará en cada página, facilitando la personalización de este tema.';
 
 $string['themeinfotext'] = 'Este tema fue creado para <strong>Cajasan</strong> por <a target="_blank" href="http://ingeweb.co/">IngeWeb - Soluciones para triunfar en Internet</a>.';
-$string['credit'] = 'Copyright © 2024 - Todos los derechos reservados';
+$string['credit'] = 'Copyright © 2025 - Todos los derechos reservados';
 
 $string['showingonlycategorieswithenrolledcourses'] = 'Mostrando solo categorías con cursos matriculados';
 $string['nocoursestoshow'] = 'No se encontraron cursos para mostrar';
