@@ -901,3 +901,17 @@ div#navbarmenutopic {
 .primary-navigation .nav.more-nav .dropdownmoremenu {
     order: 6;
 }
+
+.navbar [data-key="recentcourses"] {
+    display: none;
+}
+.navbar [data-key="coursecat"] {
+    display: none;
+}
+
+span.badge.badge-info {
+    color: white;
+}
+span.badge.rounded-pill.bg-secondary.text-dark {
+    color: white !important;
+}
