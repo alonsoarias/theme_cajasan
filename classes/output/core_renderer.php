@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides the core rendering functionality for the theme_cajasan, aligning Moodle's HTML with Bootstrap expectations.
  *
@@ -14,11 +15,19 @@
 
 namespace theme_cajasan\output;
 
-use theme_config;
+use html_writer;
+use custom_menu;
+use action_menu_filler;
+use action_menu_link_secondary;
+use stdClass;
 use moodle_url;
-use context_course;
-use moodle_exception;
-
+use action_menu;
+use pix_icon;
+use theme_config;
+use core_text;
+use help_icon;
+use context_system;
+use core_course_list_element;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../../remui/classes/output/core_renderer.php');
@@ -30,24 +39,45 @@ require_once(__DIR__ . '/../util/theme_settings.php');
  */
 class core_renderer extends \theme_remui\output\core_renderer
 {
+
+
+    /**
+     * Cached theme config
+     * @var object
+     */
+    protected $themeConfig = null;
+
+/**
+ * Get theme config with caching
+ * @return object
+ */
+public function get_theme_config()
+{
+    if ($this->themeConfig === null) {
+        $this->themeConfig = theme_config::load('cajasan');
+    }
+    return $this->themeConfig;
+}
+
     /**
      * Renders the login form.
      *
      * @param \core_auth\output\login $form The renderable.
      * @return string
      */
-    public function render_login(\core_auth\output\login $form) {
+    public function render_login(\core_auth\output\login $form)
+    {
         global $SITE;
 
         $context = $form->export_for_template($this);
 
         // Prepara el mensaje de error, si lo hubiera.
         $context->errorformatted = $this->error_text($context->error);
-    
+
         // Añade los textos para la autorización policial.
         $context->police_autorization = get_string('police_autorization', 'theme_cajasan');
         $context->police_autorization_help = get_string('police_autorization_help', 'theme_cajasan');
-    
+
         // Logo from 'remui' or from 'cajasan'? 
         // Si deseas usar el logo del tema "cajasan" en vez de "remui", cambia la línea:
         $context->logourl = $this->get_theme_logo_url('logo');
@@ -60,13 +90,13 @@ class core_renderer extends \theme_remui\output\core_renderer
     }
 
     /**
-     * Devuelve la URL de una imagen de configuración del tema (ej. loginimage, slide1, etc.)
+     * Get theme image URL.
      *
-     * @param string $img Nombre del ajuste
-     * @return string
+     * @param string $img Image name
+     * @return string Image URL
      */
     public function get_theme_img_url($img) {
-        $theme = theme_config::load('cajasan');
+        $theme = $this->get_theme_config();
         return $theme->setting_file_url($img, $img);
     }
 
@@ -76,33 +106,50 @@ class core_renderer extends \theme_remui\output\core_renderer
      * @param string $img
      * @return string|null
      */
-    public function get_theme_logo_url($img) {
+    public function get_theme_logo_url($img)
+    {
         $theme = theme_config::load('remui');
         return $theme->setting_file_url($img, $img);
     }
 
     /**
-     * Devuelve el footer estándar y agrega scripts de chat y prevención de copy/paste según configuraciones.
+     * Returns standard footer content.
      *
-     * @return string
+     * @return string HTML footer content
      */
-    public function standard_footer_html() {
-        global $USER;
+    public function standard_footer_html()
+    {
+        global $CFG, $USER;
 
-        // Footer principal heredado de theme_remui
         $output = parent::standard_footer_html();
+        $theme = $this->get_theme_config();
 
-        // Carga la configuración del tema cajasan
-        $theme = theme_config::load('cajasan');
-
-        // 1) Widget de chat
-        if (!empty($theme->settings->enable_chat)) {
+        // Add chat widget if enabled and user is logged in
+        if (!empty($this->page->theme->settings->enable_chat) && isloggedin()) {
             $output .= $this->add_chat_widget();
         }
 
-        // 2) Prevención de Copy/Paste
-        if (!empty($theme->settings->copypaste_prevention)) {
+        // Add accessibility widget only if enabled and user is logged in
+        if (isloggedin() && !empty($this->page->theme->settings->accessibility_widget)) {
+            $output .= '<script src="https://website-widgets.pages.dev/dist/sienna.min.js" defer></script>';
+            debugging('Accessibility widget loaded for user ID: ' . $USER->id, DEBUG_DEVELOPER);
+        }
+
+        // Add copy paste prevention if enabled
+        if (!empty($this->page->theme->settings->copypaste_prevention)) {
             $this->add_copy_paste_prevention();
+        }
+
+        // Check if about text should be hidden
+        if (
+            isset($this->page->theme->settings->hideabouttext) &&
+            $this->page->theme->settings->hideabouttext == 1
+        ) {
+            $output .= '<style>
+                body section#top-footer { 
+                    display: none !important; 
+                }
+            </style>';
         }
 
         return $output;
@@ -113,7 +160,8 @@ class core_renderer extends \theme_remui\output\core_renderer
      *
      * @return string
      */
-    public function full_header() {
+    public function full_header()
+    {
         global $CFG, $USER, $PAGE;
 
         $theme = theme_config::load('cajasan');
@@ -138,7 +186,7 @@ class core_renderer extends \theme_remui\output\core_renderer
         // Recordatorio para admin, si el aviso está en modo 'off'
         if (is_siteadmin() && (!empty($theme->settings->generalnoticemode) && $theme->settings->generalnoticemode === 'off')) {
             $output .= '<div class="alert mt-4"><a href="' . $CFG->wwwroot . '/admin/settings.php?section=themesettingcajasan#theme_cajasan">' .
-                       '<strong><i class="fa fa-edit"></i></strong> ' . get_string('generalnotice_create', 'theme_cajasan') . '</a></div>';
+                '<strong><i class="fa fa-edit"></i></strong> ' . get_string('generalnotice_create', 'theme_cajasan') . '</a></div>';
         }
 
         // Validación de URL (por ejemplo, para sitios de prueba)
@@ -153,108 +201,94 @@ class core_renderer extends \theme_remui\output\core_renderer
     }
 
     /**
-     * Agrega el script de chat si está configurado en el tema (enable_chat y tawkto_embed_url).
+     * Adds chat widget if enabled.
      *
-     * @return string HTML/JS del widget de chat
+     * @return string Chat widget HTML
      */
-    protected function add_chat_widget() {
+    protected function add_chat_widget()
+    {
         global $USER;
 
-        $theme = theme_config::load('cajasan');
-        // Si el usuario no ha iniciado sesión o no tenemos URL del chat, no hacemos nada
-        if (!isloggedin() || empty($theme->settings->tawkto_embed_url)) {
+        if (empty($this->page->theme->settings->tawkto_embed_url)) {
             return '';
         }
 
-        // Insertamos el script de Tawk.to (u otro) con datos del usuario
-        $script = "
-        <!--Start of Chat Script-->
+        // Sanitize user data
+        $userData = [
+            'name' => clean_param($USER->firstname . " " . $USER->lastname, PARAM_TEXT),
+            'email' => clean_param($USER->email, PARAM_EMAIL),
+            'username' => clean_param($USER->username, PARAM_USERNAME),
+            'idnumber' => clean_param($USER->idnumber, PARAM_TEXT)
+        ];
+
+        return "<!--Start of Chat Script-->
         <script type=\"text/javascript\">
-        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-        Tawk_API.visitor = {
-            name  : '" . fullname($USER) . "',
-            email : '" . $USER->email . "',
-            username : '" . $USER->username . "',
-            idnumber : '" . $USER->idnumber . "'
-        };
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        Tawk_API.visitor = " . json_encode($userData) . ";
         Tawk_API.onLoad = function(){
-            Tawk_API.setAttributes({
-                name  : '" . fullname($USER) . "',
-                email : '" . $USER->email . "',
-                username : '" . $USER->username . "',
-                idnumber : '" . $USER->idnumber . "'
-            }, function(error){});
+            Tawk_API.setAttributes(" . json_encode($userData) . ", function(error){});
         };
         (function(){
-            var s1 = document.createElement(\"script\"), s0 = document.getElementsByTagName(\"script\")[0];
-            s1.async = true;
-            s1.src = '" . $theme->settings->tawkto_embed_url . "';
-            s1.charset = 'UTF-8';
+            var s1=document.createElement(\"script\"),s0=document.getElementsByTagName(\"script\")[0];
+            s1.async=true;
+            s1.src='" . clean_param($this->page->theme->settings->tawkto_embed_url, PARAM_URL) . "';
+            s1.charset='UTF-8';
             s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1, s0);
+            s0.parentNode.insertBefore(s1,s0);
         })();
         </script>
-        <!--End of Chat Script-->
-        ";
-
-        return $script;
+        <!--End of Chat Script-->";
     }
 
     /**
-     * Agrega la lógica de prevención de Copy/Paste para roles específicos.
+     * Adds copy/paste prevention JavaScript for specified roles.
      */
     protected function add_copy_paste_prevention() {
         global $USER, $PAGE, $COURSE;
 
-        $theme = theme_config::load('cajasan');
-        $restrictedroles = $theme->settings->copypaste_roles;
-
-        // Si no hay roles restringidos, no hacemos nada.
-        if (empty($restrictedroles)) {
-            return;
-        }
-
-        // Si es administrador/a, ignoramos la restricción
-        if (is_siteadmin()) {
-            return;
-        }
-
         try {
-            // Obtenemos el contexto para saber en qué curso o página estamos
+            // Get restricted roles from theme settings
+            $restricted_roles = $this->page->theme->settings->copypaste_roles;
+
+            // Return if no roles are restricted or user is admin
+            if (empty($restricted_roles) || is_siteadmin()) {
+                return;
+            }
+
+            // Get appropriate context
             $context = null;
             if (!empty($COURSE->id) && $COURSE->id > 1) {
-                // Contexto de un curso
                 $context = \context_course::instance($COURSE->id);
             } else if (!empty($PAGE->context)) {
-                // Si no es un curso, usamos el contexto de la página actual
                 $context = $PAGE->context;
             }
 
             if (!$context) {
-                return; // No hay contexto válido
+                return;
             }
 
-            // Convertimos a array si es string (por seguridad)
-            if (!is_array($restrictedroles)) {
-                $restrictedroles = explode(',', $restrictedroles);
+            // Convert roles to array if needed
+            if (!is_array($restricted_roles)) {
+                $restricted_roles = explode(',', $restricted_roles);
             }
 
-            // Obtenemos los roles del usuario en este contexto
-            $userroles = get_user_roles($context, $USER->id);
-            $hasrestrictedrole = false;
-            foreach ($userroles as $role) {
-                if (in_array($role->roleid, $restrictedroles)) {
-                    $hasrestrictedrole = true;
+            // Check user roles
+            $has_restricted_role = false;
+            $user_roles = get_user_roles($context, $USER->id);
+
+            foreach ($user_roles as $role) {
+                if (in_array($role->roleid, $restricted_roles)) {
+                    $has_restricted_role = true;
                     break;
                 }
             }
 
-            // Si el usuario tiene algún rol restringido, aplicamos la prevención
-            if (isloggedin() && $hasrestrictedrole) {
-                // Llama a un módulo AMD con la lógica para bloquear copy/paste
+            // Apply restrictions if needed
+            if (isloggedin() && $has_restricted_role) {
                 $PAGE->requires->js_call_amd('theme_cajasan/prevent_copy_paste', 'init');
             }
-        } catch (moodle_exception $e) {
+
+        } catch (\moodle_exception $e) {
             debugging('Error in copy/paste prevention: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return;
         }
@@ -266,7 +300,8 @@ class core_renderer extends \theme_remui\output\core_renderer
      * @param string $popup_id Un ID único para el div
      * @return string
      */
-    protected function show_unauthorized_access_overlay($popup_id) {
+    protected function show_unauthorized_access_overlay($popup_id)
+    {
         $output = '';
         $output .= '<style>
             #' . $popup_id . ' {
@@ -325,7 +360,8 @@ class core_renderer extends \theme_remui\output\core_renderer
      * Comprueba si la URL actual está en la lista de URLs permitidas.
      * @return bool True si la URL está permitida, False en caso contrario.
      */
-    protected function check_allowed_urls() {
+    protected function check_allowed_urls()
+    {
         global $CFG;
         $allowed_urls = [
             'https://cajasan.moodlesoporte.net',
