@@ -15,7 +15,7 @@ $string['abouttitle_default'] = 'About Us';
 
 $string['abouttext'] = 'About Text';
 $string['abouttextdesc'] = 'Content for "About" in footer area';
-
+$string['focusmode']='Focus Mode';
 $string['loginfootertext'] = 'Login Footer';
 $string['loginfootertextdesc'] = 'Content for footer area in login page';
 
