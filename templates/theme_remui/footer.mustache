@@ -39,14 +39,16 @@
 <section id="top-footer" class="p-y-1">
     <div class="container">
         <div class="col-12">
-            {{#abouttext}}
-                <div class="my-about my-4 my-after-divider text-center">
-                    <h3>{{#str}}abouttitle, theme_cajasan{{/str}}</h3>
-                    <div class="about-text-content" style="word-wrap: break-word;">
-                        {{{abouttext}}}
-                    </div>
-                </div>
-            {{/abouttext}}
+            {{#abouttitle}}
+        <div class="row justify-content-center">
+            <div class="my-about text-center my-4 my-after-divider">
+                <h3>{{{abouttitle}}}</h3>
+                {{#abouttext}}
+                <div class="about-text-content">{{{abouttext}}}</div>
+                {{/abouttext}}
+            </div>
+        </div>
+        {{/abouttitle}}
         </div>
     </div>
     <div class="floating-buttons-wrapper">
@@ -81,118 +83,12 @@
     </div>
 </section>
 <footer id="page-footer" class="footer-popover ">
-    <div class="footer-container container">
+    <div class="footer-container container" style="display: none;">
         <div class="footer-content-popover container" data-region="footer-content-popover">
-            {{# output.has_popover_links }}
-            <div class="footer-section ">
-                <!--
-                {{#output.edw_feedback_and_support}}
-                    <div class="footer-popover-section-links">{{{output.edw_feedback_and_support}}}</div>
-                {{/output.edw_feedback_and_support}}
-                -->
-                {{# output.page_doc_link }}
-                <div class="footer-popover-section-links">{{{ output.page_doc_link }}}</div>
-                {{/ output.page_doc_link }}
-
-                {{# output.services_support_link }}
-                <div class="footer-popover-section-links">{{{ output.services_support_link }}}</div>
-                {{/ output.services_support_link }}
-
-                {{# output.supportemail }}
-                <div class="footer-popover-section-links">{{{ output.supportemail }}}</div>
-                {{/ output.supportemail }}
-            </div>
-            {{/ output.has_popover_links }}
             <div class="footer-section">
-                <div class="logininfo">
-                    {{{ output.login_info }}}
-                </div>
-                <div class="tool_usertours-resettourcontainer">
-                </div>
-
                 {{{ output.standard_footer_html }}}
                 {{{ output.standard_end_of_body_html }}}
-
-                {{#output.edwiser_check_faq}}
-                <div>{{{output.edwiser_check_faq}}}</div>
-                {{/output.edwiser_check_faq}}
             </div>
-            <div class="footer-section ">
-                {{#footerdata.poweredby}}
-                <div class="footer-poweredby">
-                    {{# str }}poweredby, theme_remui {{/ str }}
-                    {{#footerdata.isadmin}}
-                    <a href="https://edwiser.org/remui/" rel="nofollow" target="_blank">
-                        {{#str}}pluginname, theme_remui{{/str}}
-                    </a>
-                    {{/footerdata.isadmin}}
-                    {{^footerdata.isadmin}}
-                    {{#str}}pluginname, theme_remui{{/str}}
-                    {{/footerdata.isadmin}}
-
-                </div>
-                {{/footerdata.poweredby}}
-                
-                {{#output.moodle_release}}
-                <div>
-                    {{#str}}version, core{{/str}} {{{ output.moodle_release }}}
-                </div>
-                {{/output.moodle_release}}
-            </div>
-        </div>
-        <div class="footer-mainsection-wrapper">
-            {{> theme_remui/footer_sections}}
-        </div>
-        <div class="footer-secondarysection-wrapper">
-            {{#footerdata.footercopyrights}}
-            <div class="footer-copyright-wrapper " {{#attributes}} {{{.}}} {{/attributes}}>
-                <div class="{{^footerdata.footershowlogo}}d-none{{/footerdata.footershowlogo}} secondary-footer-logo">
-                    <div
-                        class="navbar-logo-footer-wrapper {{^footerdata.useheaderlogo}}d-none{{/footerdata.useheaderlogo}}">
-                        <a href="{{{ config.homeurl }}}" class="navbar-brand d-flex  m-0 p-0 aabtn footer-logo"
-                            aria-label="{{ sitename }} - {{#str}}brandname, theme_remui{{/str}}">
-                            {{#output.get_branding_context}}
-                            {{#logourl}}
-                            <img src="{{ logourl }}" class="navbar-brand-logo logo">
-                            {{/logourl}}
-
-                            {{#logominiurl}}
-                            <img src="{{ logominiurl }}" class="navbar-brand-logo logomini">
-                            {{/logominiurl}}
-
-                            {{#icononly}}
-                            <span class="navbar-brand-logo icononly"><i class="fa fa-{{siteicon}}"></i></span>
-                            {{/icononly}}
-
-                            {{#iconwithsitename}}
-                            <span class="navbar-brand-logo font-weight-bolder iconsitename">
-                                <i class="fa fa-{{siteicon}}"></i>&nbsp;
-                                {{{ sitename }}}
-                            </span>
-                            {{/iconwithsitename}}
-                            {{/output.get_branding_context}}
-                        </a>
-                    </div>
-
-                    <div
-                        class="footer-diff-logo {{^footerdata.secondaryfooterlogo}}d-none{{/footerdata.secondaryfooterlogo}}">
-                        <a href="{{{ config.homeurl }}}" class="navbar-brand d-flex m-0 p-0 aabtn footer-logo"
-                            aria-label="{{ sitename }} - {{#str}}brandname, theme_remui{{/str}}">
-                            <img src="{{footerdata.secondaryfooterlogo}}" class="navbar-brand-logo logomini">
-                        </a>
-                    </div>
-                </div>
-                <div class="footer-content-debugging footer-dark">
-                    <div class="footer-content-debugging-wrapper footer-dark-inner ">
-                        {{> theme_remui/footer_legal}}
-                    </div>
-                </div>
-                <div class="copyright-content secondary-footer-copyright {{^footercopyrightsshow}}d-none{{/footercopyrightsshow}}"
-                    {{#attributes}} {{{.}}} {{/attributes}}>
-                    <p class=" mb-0">{{{content}}}</p>
-                </div>
-            </div>
-            {{/footerdata.footercopyrights}}
         </div>
         {{{ output.debug_footer_html }}}
     </div>
