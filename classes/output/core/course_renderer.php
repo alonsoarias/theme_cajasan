@@ -9,7 +9,7 @@
  * @package    theme_cajasan
  * @category   output
  * @author     Pedro Alonso Arias Balcucho
- * @copyright  2024 Soporte cajasan <soporte@cajasan.co>
+ * @copyright  2025 Soporte cajasan <soporte@cajasan.co>
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
