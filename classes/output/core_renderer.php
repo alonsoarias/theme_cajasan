@@ -201,44 +201,52 @@ public function get_theme_config()
     }
 
     /**
-     * Adds chat widget if enabled.
+     * Agrega el script de chat si está configurado en el tema (enable_chat y tawkto_embed_url).
      *
-     * @return string Chat widget HTML
+     * @return string HTML/JS del widget de chat
      */
-    protected function add_chat_widget()
-    {
+    protected function add_chat_widget() {
         global $USER;
 
-        if (empty($this->page->theme->settings->tawkto_embed_url)) {
+        // Si el usuario no ha iniciado sesión o no tenemos URL del chat, no hacemos nada
+        if (!isloggedin() || empty($this->page->theme->settings->tawkto_embed_url)) { 
             return '';
         }
 
-        // Sanitize user data
-        $userData = [
-            'name' => clean_param($USER->firstname . " " . $USER->lastname, PARAM_TEXT),
-            'email' => clean_param($USER->email, PARAM_EMAIL),
-            'username' => clean_param($USER->username, PARAM_USERNAME),
-            'idnumber' => clean_param($USER->idnumber, PARAM_TEXT)
-        ];
-
-        return "<!--Start of Chat Script-->
+        // Insertamos el script de Tawk.to (u otro) con datos del usuario
+        $script = "
+        <!--Start of Chat Script-->
         <script type=\"text/javascript\">
-        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-        Tawk_API.visitor = " . json_encode($userData) . ";
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        Tawk_API.visitor = {
+            name  : '" . fullname($USER) . "',
+            email : '" . $USER->email . "',
+            username : '" . $USER->username . "',
+            idnumber : '" . $USER->idnumber . "'
+        };
         Tawk_API.onLoad = function(){
-            Tawk_API.setAttributes(" . json_encode($userData) . ", function(error){});
+            Tawk_API.setAttributes({
+                name  : '" . fullname($USER) . "',
+                email : '" . $USER->email . "',
+                username : '" . $USER->username . "',
+                idnumber : '" . $USER->idnumber . "'
+            }, function(error){});
         };
         (function(){
-            var s1=document.createElement(\"script\"),s0=document.getElementsByTagName(\"script\")[0];
-            s1.async=true;
-            s1.src='" . clean_param($this->page->theme->settings->tawkto_embed_url, PARAM_URL) . "';
-            s1.charset='UTF-8';
+            var s1 = document.createElement(\"script\"), s0 = document.getElementsByTagName(\"script\")[0];
+            s1.async = true;
+            s1.src = '" . $this->page->theme->settings->tawkto_embed_url . "';
+            s1.charset = 'UTF-8';
             s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1,s0);
+            s0.parentNode.insertBefore(s1, s0);
         })();
         </script>
-        <!--End of Chat Script-->";
+        <!--End of Chat Script-->
+        ";
+
+        return $script;
     }
+
 
     /**
      * Adds copy/paste prevention JavaScript for specified roles.
