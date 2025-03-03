@@ -15,7 +15,7 @@ $string['abouttitle_default'] = 'Acerca de Nosotros';
 
 $string['abouttext'] = 'Texto Acerca de';
 $string['abouttextdesc'] = 'Contenido para la sección "Acerca de" en el pie de página';
-
+$string['focusmode']='Modo de enfoque';
 $string['loginfootertext'] = 'Pie de página del login';
 $string['loginfootertextdesc'] = 'Contenido para el área del pie de página en la página de inicio de sesión';
 
