@@ -330,8 +330,8 @@ class core_renderer extends \theme_remui\output\core_renderer
         $allowed_urls = [
             'https://cajasan.moodlesoporte.net',
             'http://cajasan.moodlesoporte.net',
-            'https://aulavirtual.cajasan.edu.co',
-            'http://aulavirtual.cajasan.edu.co',
+            'https://aulavirtual.cajasan.com',
+            'http://aulavirtual.cajasan.com',
             'https://moodle45.localhost.com',
             'http://moodle45.localhost.com',
             'https://demomoodle.ingeweb.co',
