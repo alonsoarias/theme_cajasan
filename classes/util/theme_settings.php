@@ -30,14 +30,20 @@ class settings {
      */
     public function footer() {
         $templatecontext = [];
-
-        // Retrieve 'my_credit' from the theme settings or use a default value if not set.
-        $templatecontext['my_credit'] = get_string('credit', 'theme_cajasan');
-
-        // Retrieve 'abouttext' from the theme settings or use a default value if not set.
-        $templatecontext['abouttitle'] = !empty($this->theme->settings->abouttext) ? $this->theme->settings->abouttext : get_string('abouttitle_default', 'theme_cajasan');
-        $templatecontext['abouttext'] = !empty($this->theme->settings->abouttext) ? $this->theme->settings->abouttext : get_string('abouttext_default', 'theme_cajasan');
-
+        
+        // Retrieve 'my_credit' from the theme settings
+        $templatecontext['my_credit'] = get_string('credit', 'theme_inteb');
+        
+        // Comprobar y cargar correctamente abouttitle
+        $templatecontext['abouttitle'] = $this->theme->settings->abouttitle
+            ? $this->theme->settings->abouttitle 
+            : get_string('abouttitle_default', 'theme_inteb');
+        
+        // Comprobar y cargar correctamente abouttext
+        $templatecontext['abouttext'] = $this->theme->settings->abouttext
+            ? $this->theme->settings->abouttext 
+            : get_string('abouttext_default', 'theme_inteb');
+        
         return $templatecontext;
     }
 
