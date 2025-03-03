@@ -36,7 +36,7 @@ $ADMIN->add('appearance', new admin_category('theme_cajasan', get_string('plugin
 // Crear objeto de configuraciones con pestañas
 $asettings = new theme_cajasan_admin_settingspage_tabs(
     'themesettingcajasan',
-    get_string('configtitle', 'theme_cajasan'),
+    get_string('themesettings', 'theme_cajasan'),
     'moodle/site:config'
 );
 
